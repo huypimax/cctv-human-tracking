@@ -1,25 +1,19 @@
 import cv2
 import time
-
 from camera import ESP32Camera
 from detection import PersonDetector
 from tracking import PersonTracker
-from serial_communication import SerialComm
+from serial_communication import SerialCommunication
 
 
-# ================== CONFIG ==================
 ESP32_IP = "192.168.137.8"
 SERIAL_PORT = "COM4"
-
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
-
 CENTER_X = FRAME_WIDTH // 2
 CENTER_Y = FRAME_HEIGHT // 2
-
 Kp = 0.02
 DEAD_ZONE = 20
-
 CONTROL_INTERVAL = 0.1
 
 
@@ -27,14 +21,13 @@ CONTROL_INTERVAL = 0.1
 cam = ESP32Camera(ESP32_IP)
 detector = PersonDetector()
 tracker = PersonTracker()
-ser = SerialComm(SERIAL_PORT)
+ser = SerialCommunication(SERIAL_PORT)
 
 cam.start()
 
 print("System started...")
 
 
-# ================== LOOP ==================
 next_control = time.perf_counter()
 
 while True:
@@ -43,16 +36,10 @@ while True:
         continue
 
     frame = cv2.resize(frame, (FRAME_WIDTH, FRAME_HEIGHT))
-
-    # ================== DETECTION ==================
     detections = detector.detect(frame)
-
-    # ================== TRACKING ==================
     tracks = tracker.update(detections, frame)
-
     target = tracker.select_target(tracks, CENTER_X, CENTER_Y)
 
-    # ================== CONTROL ==================
     now = time.perf_counter()
 
     if target is not None:
@@ -85,19 +72,13 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1, (0, 0, 255), 2)
 
-    # ================== DRAW ==================
     frame = tracker.draw(frame, tracks, target)
-
     cv2.circle(frame, (CENTER_X, CENTER_Y), 5, (255, 0, 0), -1)
-
     cv2.imshow("CCTV Human Tracking", frame)
 
-    # ================== EXIT ==================
     if cv2.waitKey(1) & 0xFF == 27:
         break
 
-
-# ================== CLEANUP ==================
 cam.stop()
 ser.close()
 cv2.destroyAllWindows()
