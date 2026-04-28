@@ -16,17 +16,13 @@ Kp = 0.02
 DEAD_ZONE = 20
 CONTROL_INTERVAL = 0.1
 
-
-# ================== INIT ==================
 cam = ESP32Camera(ESP32_IP)
 detector = PersonDetector()
 tracker = PersonTracker()
 ser = SerialCommunication(SERIAL_PORT)
 
 cam.start()
-
 print("System started...")
-
 
 next_control = time.perf_counter()
 
