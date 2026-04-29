@@ -3,6 +3,7 @@ import time
 
 
 class SerialCommunication:
+    #tùy vào esp32 kết nối cổng COM nào
     def __init__(self, port="COM4", baudrate=115200):
         try:
             self.ser = serial.Serial(port, baudrate, timeout=1)
