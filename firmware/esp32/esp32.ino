@@ -26,6 +26,7 @@ void loop() {
 
     if (cmd.startsWith("HOME")) {
       int comma1 = cmd.indexOf(',');
+      
       int comma2 = cmd.indexOf(',', comma1 + 1);
 
       if (comma1 > 0 && comma2 > comma1) {
